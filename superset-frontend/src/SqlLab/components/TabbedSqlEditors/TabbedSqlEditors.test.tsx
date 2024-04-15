@@ -20,7 +20,8 @@ import React from 'react';
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import URI from 'urijs';
-import { fireEvent, render, waitFor } from 'spec/helpers/testing-library';
+import { render, waitFor } from 'spec/helpers/testing-library';
+import userEvent from '@testing-library/user-event';
 import fetchMock from 'fetch-mock';
 import TabbedSqlEditors from 'src/SqlLab/components/TabbedSqlEditors';
 import { initialState } from 'src/SqlLab/fixtures';
@@ -116,7 +117,7 @@ test('should removeQueryEditor', async () => {
   const closeButton = tabList.getElementsByTagName('button')[0];
   expect(closeButton).toBeInTheDocument();
   if (closeButton) {
-    fireEvent.click(closeButton);
+    userEvent.click(closeButton);
   }
   await waitFor(() => expect(getAllByRole('tab').length).toEqual(tabCount - 1));
   expect(queryByText(initialState.sqlLab.queryEditors[0].name)).toBeFalsy();
@@ -124,7 +125,7 @@ test('should removeQueryEditor', async () => {
 test('should add new query editor', async () => {
   const { getAllByLabelText, getAllByRole } = setup(undefined, initialState);
   const tabCount = getAllByRole('tab').length;
-  fireEvent.click(getAllByLabelText('Add tab')[0]);
+  userEvent.click(getAllByLabelText('Add tab')[0]);
   await waitFor(() => expect(getAllByRole('tab').length).toEqual(tabCount + 1));
   expect(getAllByRole('tab')[tabCount]).toHaveTextContent(
     /Untitled Query (\d+)+/,
@@ -134,14 +135,14 @@ test('should properly increment query tab name', async () => {
   const { getAllByLabelText, getAllByRole } = setup(undefined, initialState);
   const tabCount = getAllByRole('tab').length;
   const newTitle = newQueryTabName(initialState.sqlLab.queryEditors);
-  fireEvent.click(getAllByLabelText('Add tab')[0]);
+  userEvent.click(getAllByLabelText('Add tab')[0]);
   await waitFor(() => expect(getAllByRole('tab').length).toEqual(tabCount + 1));
   expect(getAllByRole('tab')[tabCount]).toHaveTextContent(newTitle);
 });
 test('should handle select', async () => {
   const { getAllByRole } = setup(store);
   const tabs = getAllByRole('tab');
-  fireEvent.click(tabs[1]);
+  userEvent.click(tabs[1]);
   await waitFor(() => expect(store.getActions()).toHaveLength(1));
   expect(store.getActions()[0]).toEqual(
     expect.objectContaining({
